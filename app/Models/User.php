@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -24,6 +25,8 @@ class User extends Authenticatable
         'password',
         'role',
         'phone',
+        'bus_operator_id',
+        'user_status',
     ];
 
     /**
@@ -49,6 +52,8 @@ class User extends Authenticatable
         ];
     }
 
+    // Relationships
+
     public function tickets(): HasMany
     {
         return $this->hasMany(Ticket::class);
@@ -59,19 +64,62 @@ class User extends Authenticatable
         return $this->hasMany(Payment::class);
     }
 
-    public function isAdmin(): bool
+    public function busOperator(): BelongsTo
     {
-        return $this->role === 'admin';
+        return $this->belongsTo(BusOperator::class);
     }
 
-    public function isVerifier(): bool
+    // Role checks
+
+    public function isSuperAdmin(): bool
     {
-        return $this->role === 'verifier';
+        return $this->role === 'super_admin';
+    }
+
+    public function isOperator(): bool
+    {
+        return $this->role === 'operator';
     }
 
     public function isBuyer(): bool
     {
         return $this->role === 'buyer';
     }
-}
 
+    // Backward compatibility
+    public function isAdmin(): bool
+    {
+        return $this->isSuperAdmin() || $this->isOperator();
+    }
+
+    public function isVerifier(): bool
+    {
+        return $this->isOperator();
+    }
+
+    // Status checks
+
+    public function isActive(): bool
+    {
+        return $this->user_status === 'active';
+    }
+
+    public function isPending(): bool
+    {
+        return $this->user_status === 'pending';
+    }
+
+    public function isSuspended(): bool
+    {
+        return $this->user_status === 'suspended';
+    }
+
+    // Operator-specific checks
+
+    public function hasApprovedOperator(): bool
+    {
+        return $this->isOperator() 
+            && $this->busOperator 
+            && $this->busOperator->isApproved();
+    }
+}

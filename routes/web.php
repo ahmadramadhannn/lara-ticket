@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\Operator\OperatorRegistrationController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
@@ -18,6 +20,17 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [ScheduleController::class, 'index'])->name('home');
 Route::get('/schedules', [ScheduleController::class, 'search'])->name('schedules.search');
 Route::get('/schedules/{schedule}', [ScheduleController::class, 'show'])->name('schedules.show');
+
+/*
+|--------------------------------------------------------------------------
+| Operator Registration Routes (Guests)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('guest')->prefix('operator')->group(function () {
+    Route::get('/register', [OperatorRegistrationController::class, 'create'])->name('operator.register');
+    Route::post('/register', [OperatorRegistrationController::class, 'store'])->name('operator.register.store');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -48,11 +61,58 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Verifier Routes
+| Operator Routes (Pending - Show waiting page)
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:verifier,admin'])->prefix('ticket-check')->group(function () {
+Route::middleware('auth')->prefix('operator')->group(function () {
+    Route::get('/pending', [OperatorRegistrationController::class, 'pending'])->name('operator.pending');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Operator Routes (Approved operators only)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'role:operator', 'operator.approved'])->prefix('operator')->name('operator.')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('operator.dashboard');
+    })->name('dashboard');
+    // TODO: Add schedule and bus management routes
+});
+
+/*
+|--------------------------------------------------------------------------
+| Super Admin Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'role:super_admin'])->prefix('super-admin')->name('super-admin.')->group(function () {
+    Route::get('/dashboard', [SuperAdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/registrations', [SuperAdminController::class, 'registrations'])->name('registrations');
+    Route::get('/registrations/{operator}', [SuperAdminController::class, 'showRegistration'])->name('registrations.show');
+    Route::post('/registrations/{operator}/approve', [SuperAdminController::class, 'approve'])->name('approve');
+    Route::post('/registrations/{operator}/reject', [SuperAdminController::class, 'reject'])->name('reject');
+    
+    // Terminals CRUD - TODO
+    Route::get('/terminals', function () {
+        return view('super-admin.terminals.index');
+    })->name('terminals.index');
+    
+    // Operators CRUD - TODO
+    Route::get('/operators', function () {
+        return view('super-admin.operators.index');
+    })->name('operators.index');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Verifier Routes (Operators can verify tickets)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'role:operator,super_admin'])->prefix('ticket-check')->group(function () {
     Route::get('/', [VerificationController::class, 'index'])->name('ticket-check.index');
     Route::post('/', [VerificationController::class, 'verify'])->name('ticket-check.verify');
     Route::post('/mark-used/{ticket}', [VerificationController::class, 'markUsed'])->name('ticket-check.markUsed');
@@ -64,7 +124,7 @@ Route::middleware(['auth', 'role:verifier,admin'])->prefix('ticket-check')->grou
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth:sanctum', 'role:verifier,admin'])->prefix('api')->group(function () {
+Route::middleware(['auth:sanctum', 'role:operator,super_admin'])->prefix('api')->group(function () {
     Route::post('/verify-ticket', [VerificationController::class, 'apiVerify']);
 });
 
