@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             LocationSeeder::class,
             BusOperatorSeeder::class,
             RouteScheduleSeeder::class,
+            SampleBookingSeeder::class,
         ]);
     }
 }
