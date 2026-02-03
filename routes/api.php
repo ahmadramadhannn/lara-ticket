@@ -103,29 +103,24 @@ Route::prefix('tickets')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('data')->group(function () {
-    /**
-     * Get list of all active terminals.
-     */
-    Route::get('/terminals', function () {
-        return response()->json([
-            'success' => true,
-            'data' => \App\Models\Terminal::with('city.province')
-                ->where('is_active', true)
-                ->orderBy('name')
-                ->get(),
-        ]);
-    })->name('api.terminals.index');
+Route::get('/terminals', function () {
+    return response()->json([
+        'success' => true,
+        'data' => \App\Models\Terminal::with('city.province')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(),
+    ]);
+})->name('api.terminals.index');
 
-    /**
-     * Get list of all active bus operators.
-     */
-    Route::get('/operators', function () {
-        return response()->json([
-            'success' => true,
-            'data' => \App\Models\BusOperator::where('is_active', true)
-                ->orderBy('name')
-                ->get(),
-        ]);
-    })->name('api.operators.index');
-});
+/**
+ * Get list of all active bus operators.
+ */
+Route::get('/operators', function () {
+    return response()->json([
+        'success' => true,
+        'data' => \App\Models\BusOperator::where('is_active', true)
+            ->orderBy('name')
+            ->get(),
+    ]);
+})->name('api.operators.index');
