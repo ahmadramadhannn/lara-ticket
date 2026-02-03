@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard Super Admin') }}
+            {{ __('Super Admin Dashboard') }}
         </h2>
     </x-slot>
 
@@ -18,7 +18,7 @@
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-600">{{ __('Menunggu Persetujuan') }}</p>
+                                <p class="text-sm font-medium text-gray-600">{{ __('Pending Approval') }}</p>
                                 <p class="text-2xl font-semibold text-gray-900">{{ $stats['pending_registrations'] }}</p>
                             </div>
                         </div>
@@ -34,7 +34,7 @@
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-600">{{ __('PO Terverifikasi') }}</p>
+                                <p class="text-sm font-medium text-gray-600">{{ __('Verified Operators') }}</p>
                                 <p class="text-2xl font-semibold text-gray-900">{{ $stats['approved_operators'] }}</p>
                             </div>
                         </div>
@@ -50,7 +50,7 @@
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-600">{{ __('Total Terminal') }}</p>
+                                <p class="text-sm font-medium text-gray-600">{{ __('Total Terminals') }}</p>
                                 <p class="text-2xl font-semibold text-gray-900">{{ $stats['total_terminals'] }}</p>
                             </div>
                         </div>
@@ -66,7 +66,7 @@
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-600">{{ __('Total User') }}</p>
+                                <p class="text-sm font-medium text-gray-600">{{ __('Total Users') }}</p>
                                 <p class="text-2xl font-semibold text-gray-900">{{ $stats['total_users'] }}</p>
                             </div>
                         </div>
@@ -79,8 +79,8 @@
                 <a href="{{ route('super-admin.registrations') }}" class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md transition-shadow">
                     <div class="p-6 flex items-center justify-between">
                         <div>
-                            <p class="font-medium text-gray-900">{{ __('Pendaftaran PO') }}</p>
-                            <p class="text-sm text-gray-500">{{ __('Kelola pendaftaran operator') }}</p>
+                            <p class="font-medium text-gray-900">{{ __('PO Registration') }}</p>
+                            <p class="text-sm text-gray-500">{{ __('Manage operator registrations') }}</p>
                         </div>
                         <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -91,8 +91,8 @@
                 <a href="{{ route('super-admin.terminals.index') }}" class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md transition-shadow">
                     <div class="p-6 flex items-center justify-between">
                         <div>
-                            <p class="font-medium text-gray-900">{{ __('Kelola Terminal') }}</p>
-                            <p class="text-sm text-gray-500">{{ __('Tambah, edit, hapus terminal') }}</p>
+                            <p class="font-medium text-gray-900">{{ __('Manage Terminals') }}</p>
+                            <p class="text-sm text-gray-500">{{ __('Add, edit, delete terminals') }}</p>
                         </div>
                         <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -103,8 +103,8 @@
                 <a href="{{ route('super-admin.operators.index') }}" class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md transition-shadow">
                     <div class="p-6 flex items-center justify-between">
                         <div>
-                            <p class="font-medium text-gray-900">{{ __('Kelola PO') }}</p>
-                            <p class="text-sm text-gray-500">{{ __('Daftar semua operator bus') }}</p>
+                            <p class="font-medium text-gray-900">{{ __('Manage Operators') }}</p>
+                            <p class="text-sm text-gray-500">{{ __('List all bus operators') }}</p>
                         </div>
                         <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -117,16 +117,16 @@
             @if($recentPending->count() > 0)
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('Pendaftaran Terbaru Menunggu Persetujuan') }}</h3>
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('Recent Pending Registrations') }}</h3>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Nama PO') }}</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Kode') }}</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Pemohon') }}</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Tanggal') }}</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Aksi') }}</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('PO Name') }}</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Code') }}</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Applicant') }}</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Date') }}</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -137,7 +137,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $operator->submittedBy?->name ?? '-' }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $operator->created_at->format('d M Y') }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                        <a href="{{ route('super-admin.registrations.show', $operator) }}" class="text-indigo-600 hover:text-indigo-900">{{ __('Lihat Detail') }}</a>
+                                        <a href="{{ route('super-admin.registrations.show', $operator) }}" class="text-indigo-600 hover:text-indigo-900">{{ __('View Details') }}</a>
                                     </td>
                                 </tr>
                                 @endforeach
@@ -146,7 +146,7 @@
                     </div>
                     @if($stats['pending_registrations'] > 5)
                     <div class="mt-4">
-                        <a href="{{ route('super-admin.registrations') }}" class="text-sm text-indigo-600 hover:text-indigo-900">{{ __('Lihat semua pendaftaran →') }}</a>
+                        <a href="{{ route('super-admin.registrations') }}" class="text-sm text-indigo-600 hover:text-indigo-900">{{ __('View all registrations') }} →</a>
                     </div>
                     @endif
                 </div>

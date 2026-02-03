@@ -16,10 +16,10 @@
                             </svg>
                         </div>
                         <h3 class="text-lg font-medium text-gray-900 mb-2">
-                            {{ __('Selamat Datang, ') }}{{ auth()->user()->name }}!
+                            {{ __('Welcome') }}, {{ auth()->user()->name }}!
                         </h3>
                         <p class="text-gray-600 mb-4">
-                            {{ __('Anda terdaftar sebagai operator untuk:') }}
+                            {{ __('You are registered as operator for') }}:
                         </p>
                         @if(auth()->user()->busOperator)
                         <p class="text-xl font-semibold text-indigo-600">
@@ -29,7 +29,7 @@
                     </div>
 
                     <div class="border-t pt-6 mt-6">
-                        <h4 class="font-medium text-gray-900 mb-4">{{ __('Menu Operator') }}</h4>
+                        <h4 class="font-medium text-gray-900 mb-4">{{ __('Operator Menu') }}</h4>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <a href="{{ route('ticket-check.index') }}" class="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
                                 <div class="flex items-center">
@@ -39,8 +39,8 @@
                                         </svg>
                                     </div>
                                     <div class="ml-4">
-                                        <p class="font-medium text-gray-900">{{ __('Verifikasi Tiket') }}</p>
-                                        <p class="text-sm text-gray-500">{{ __('Scan dan verifikasi tiket penumpang') }}</p>
+                                        <p class="font-medium text-gray-900">{{ __('Verify Ticket') }}</p>
+                                        <p class="text-sm text-gray-500">{{ __('Scan QR Code') }}</p>
                                     </div>
                                 </div>
                             </a>
@@ -53,8 +53,8 @@
                                         </svg>
                                     </div>
                                     <div class="ml-4">
-                                        <p class="font-medium text-gray-400">{{ __('Kelola Jadwal') }}</p>
-                                        <p class="text-sm text-gray-400">{{ __('Segera hadir') }}</p>
+                                        <p class="font-medium text-gray-400">{{ __('Manage Schedule') }}</p>
+                                        <p class="text-sm text-gray-400">{{ __('Coming soon') }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -67,8 +67,8 @@
                                         </svg>
                                     </div>
                                     <div class="ml-4">
-                                        <p class="font-medium text-gray-400">{{ __('Kelola Bus') }}</p>
-                                        <p class="text-sm text-gray-400">{{ __('Segera hadir') }}</p>
+                                        <p class="font-medium text-gray-400">{{ __('Manage Bus') }}</p>
+                                        <p class="text-sm text-gray-400">{{ __('Coming soon') }}</p>
                                     </div>
                                 </div>
                             </div>

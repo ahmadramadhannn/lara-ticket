@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Cari Tiket Bus') }}
+            {{ __('Search Tickets') }}
         </h2>
     </x-slot>
 
@@ -11,10 +11,10 @@
             <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg shadow-xl overflow-hidden mb-8">
                 <div class="px-6 py-12 md:px-12 text-center">
                     <h1 class="text-4xl font-bold text-white mb-4">
-                        Pesan Tiket Bus Online
+                        {{ __('Book Online Bus Tickets') }}
                     </h1>
                     <p class="text-indigo-100 text-lg mb-8">
-                        Perjalanan nyaman dengan harga terbaik
+                        {{ __('Comfortable travel at the best price') }}
                     </p>
                 </div>
             </div>
@@ -26,11 +26,11 @@
                         <!-- Origin -->
                         <div>
                             <label for="origin" class="block text-sm font-medium text-gray-700 mb-1">
-                                Dari
+                                {{ __('From') }}
                             </label>
                             <select id="origin" name="origin" required
                                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                <option value="">Pilih Terminal Asal</option>
+                                <option value="">{{ __('Select Origin Terminal') }}</option>
                                 @foreach($terminals as $province => $provinceTerminals)
                                     <optgroup label="{{ $province }}">
                                         @foreach($provinceTerminals as $terminal)
@@ -46,11 +46,11 @@
                         <!-- Destination -->
                         <div>
                             <label for="destination" class="block text-sm font-medium text-gray-700 mb-1">
-                                Ke
+                                {{ __('To') }}
                             </label>
                             <select id="destination" name="destination" required
                                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                <option value="">Pilih Terminal Tujuan</option>
+                                <option value="">{{ __('Select Destination Terminal') }}</option>
                                 @foreach($terminals as $province => $provinceTerminals)
                                     <optgroup label="{{ $province }}">
                                         @foreach($provinceTerminals as $terminal)
@@ -66,7 +66,7 @@
                         <!-- Date -->
                         <div>
                             <label for="date" class="block text-sm font-medium text-gray-700 mb-1">
-                                Tanggal Berangkat
+                                {{ __('Departure Date') }}
                             </label>
                             <input type="date" id="date" name="date" required
                                 min="{{ date('Y-m-d') }}"
@@ -77,11 +77,11 @@
                         <!-- Operator (optional) -->
                         <div>
                             <label for="operator" class="block text-sm font-medium text-gray-700 mb-1">
-                                PO Bus (opsional)
+                                {{ __('Bus Operator (optional)') }}
                             </label>
                             <select id="operator" name="operator"
                                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                <option value="">Semua PO</option>
+                                <option value="">{{ __('All Operators') }}</option>
                                 @foreach($operators as $operator)
                                     <option value="{{ $operator->id }}">{{ $operator->name }}</option>
                                 @endforeach
@@ -92,7 +92,7 @@
                     <div class="flex justify-center">
                         <button type="submit"
                             class="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition">
-                            🔍 Cari Jadwal
+                            🔍 {{ __('Search Schedule') }}
                         </button>
                     </div>
                 </form>
@@ -102,18 +102,18 @@
             <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-white rounded-lg shadow p-6 text-center">
                     <div class="text-4xl mb-4">🎫</div>
-                    <h3 class="font-semibold text-lg mb-2">E-Ticket</h3>
-                    <p class="text-gray-600 text-sm">Tiket digital dengan QR code, tidak perlu cetak</p>
+                    <h3 class="font-semibold text-lg mb-2">{{ __('E-Ticket') }}</h3>
+                    <p class="text-gray-600 text-sm">{{ __('Digital ticket with QR code, no need to print') }}</p>
                 </div>
                 <div class="bg-white rounded-lg shadow p-6 text-center">
                     <div class="text-4xl mb-4">🔒</div>
-                    <h3 class="font-semibold text-lg mb-2">Aman & Terpercaya</h3>
-                    <p class="text-gray-600 text-sm">Pembayaran terjamin dengan berbagai metode</p>
+                    <h3 class="font-semibold text-lg mb-2">{{ __('Safe & Trusted') }}</h3>
+                    <p class="text-gray-600 text-sm">{{ __('Secure payment with various methods') }}</p>
                 </div>
                 <div class="bg-white rounded-lg shadow p-6 text-center">
                     <div class="text-4xl mb-4">🚌</div>
-                    <h3 class="font-semibold text-lg mb-2">Banyak Pilihan</h3>
-                    <p class="text-gray-600 text-sm">Berbagai PO bus terbaik di Indonesia</p>
+                    <h3 class="font-semibold text-lg mb-2">{{ __('Many Choices') }}</h3>
+                    <p class="text-gray-600 text-sm">{{ __('Various best bus operators in Indonesia') }}</p>
                 </div>
             </div>
         </div>

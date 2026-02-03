@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\Operator\OperatorRegistrationController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
@@ -15,6 +16,9 @@ use Illuminate\Support\Facades\Route;
 | Public Routes
 |--------------------------------------------------------------------------
 */
+
+// Language switch
+Route::get('/language/{locale}', [LanguageController::class, 'switch'])->name('language.switch');
 
 // Landing page / Schedule search
 Route::get('/', [ScheduleController::class, 'index'])->name('home');

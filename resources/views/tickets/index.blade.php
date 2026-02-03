@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Tiket Saya
+            {{ __('My Tickets') }}
         </h2>
     </x-slot>
 
@@ -9,13 +9,13 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Upcoming Tickets -->
             <div class="mb-8">
-                <h3 class="font-bold text-lg mb-4">Tiket Aktif</h3>
+                <h3 class="font-bold text-lg mb-4">{{ __('Active Tickets') }}</h3>
 
                 @if($upcomingTickets->isEmpty())
                     <div class="bg-gray-50 rounded-lg p-6 text-center">
-                        <p class="text-gray-500">Tidak ada tiket aktif.</p>
+                        <p class="text-gray-500">{{ __('No active tickets') }}.</p>
                         <a href="{{ route('home') }}" class="mt-4 inline-block text-indigo-600 hover:text-indigo-800">
-                            Cari Tiket →
+                            {{ __('Search Tickets') }} →
                         </a>
                     </div>
                 @else
@@ -26,7 +26,7 @@
                                     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
                                         <!-- Booking Code -->
                                         <div class="mb-4 lg:mb-0">
-                                            <p class="text-xs text-gray-500">Kode Booking</p>
+                                            <p class="text-xs text-gray-500">{{ __('Booking Code') }}</p>
                                             <p class="font-mono font-bold text-lg">{{ $ticket->booking_code }}</p>
                                             <span class="inline-block px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded mt-1">
                                                 {{ ucfirst($ticket->status) }}
@@ -48,15 +48,15 @@
 
                                         <!-- Passenger & Seat -->
                                         <div class="mb-4 lg:mb-0">
-                                            <p class="text-sm text-gray-500">Penumpang</p>
+                                            <p class="text-sm text-gray-500">{{ __('Passenger') }}</p>
                                             <p class="font-medium">{{ $ticket->passenger_name }}</p>
-                                            <p class="text-sm text-gray-600">Kursi: {{ $ticket->seat_number }}</p>
+                                            <p class="text-sm text-gray-600">{{ __('Seat') }}: {{ $ticket->seat_number }}</p>
                                         </div>
 
                                         <!-- Action -->
                                         <a href="{{ route('tickets.show', $ticket) }}"
                                             class="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition text-center">
-                                            Lihat Detail
+                                            {{ __('View Details') }}
                                         </a>
                                     </div>
                                 </div>
@@ -69,15 +69,15 @@
             <!-- Past Tickets -->
             @if($pastTickets->isNotEmpty())
                 <div>
-                    <h3 class="font-bold text-lg mb-4">Riwayat Perjalanan</h3>
+                    <h3 class="font-bold text-lg mb-4">{{ __('Travel History') }}</h3>
                     <div class="bg-white rounded-lg shadow-sm overflow-hidden">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kode</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rute</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Code') }}</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Route') }}</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Date') }}</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Status') }}</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">

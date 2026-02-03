@@ -13,13 +13,13 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('home')" :active="request()->routeIs('home')">
-                        {{ __('Cari Tiket') }}
+                        {{ __('Search Tickets') }}
                     </x-nav-link>
                     
                     @auth
                         @if(Auth::user()->isBuyer())
                             <x-nav-link :href="route('tickets.index')" :active="request()->routeIs('tickets.*')">
-                                {{ __('Tiket Saya') }}
+                                {{ __('My Tickets') }}
                             </x-nav-link>
                         @endif
 
@@ -28,7 +28,7 @@
                                 {{ __('Dashboard Operator') }}
                             </x-nav-link>
                             <x-nav-link :href="route('ticket-check.index')" :active="request()->routeIs('ticket-check.*')">
-                                {{ __('Verifikasi Tiket') }}
+                                {{ __('Verify Ticket') }}
                             </x-nav-link>
                         @endif
 
@@ -111,9 +111,24 @@
             @else
                 <!-- Guest Links -->
                 <div class="hidden sm:flex sm:items-center sm:ms-6 space-x-4">
-                    <a href="{{ route('login') }}" class="text-gray-600 hover:text-gray-900">Log in</a>
-                    <a href="{{ route('register') }}" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Register</a>
-                    <a href="{{ route('operator.register') }}" class="px-4 py-2 border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-50">Daftar PO</a>
+                    <!-- Language Switcher -->
+                    <div class="relative" x-data="{ langOpen: false }">
+                        <button @click="langOpen = !langOpen" class="flex items-center text-sm text-gray-600 hover:text-gray-900">
+                            <span class="mr-1">{{ app()->getLocale() === 'id' ? '🇮🇩' : '🇬🇧' }}</span>
+                            <span>{{ app()->getLocale() === 'id' ? 'ID' : 'EN' }}</span>
+                        </button>
+                        <div x-show="langOpen" @click.away="langOpen = false" class="absolute right-0 mt-2 w-24 bg-white rounded-md shadow-lg py-1 z-50">
+                            <a href="{{ route('language.switch', 'id') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ app()->getLocale() === 'id' ? 'bg-gray-100' : '' }}">
+                                🇮🇩 Indonesia
+                            </a>
+                            <a href="{{ route('language.switch', 'en') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ app()->getLocale() === 'en' ? 'bg-gray-100' : '' }}">
+                                🇬🇧 English
+                            </a>
+                        </div>
+                    </div>
+                    <a href="{{ route('login') }}" class="text-gray-600 hover:text-gray-900">{{ __('Login') }}</a>
+                    <a href="{{ route('register') }}" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">{{ __('Register') }}</a>
+                    <a href="{{ route('operator.register') }}" class="px-4 py-2 border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-50">{{ __('Register PO') }}</a>
                 </div>
                 <div class="-me-2 flex items-center sm:hidden">
                     <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
@@ -131,13 +146,13 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')">
-                {{ __('Cari Tiket') }}
+                {{ __('Search Tickets') }}
             </x-responsive-nav-link>
             
             @auth
                 @if(Auth::user()->isBuyer())
                     <x-responsive-nav-link :href="route('tickets.index')" :active="request()->routeIs('tickets.*')">
-                        {{ __('Tiket Saya') }}
+                        {{ __('My Tickets') }}
                     </x-responsive-nav-link>
                 @endif
 
@@ -146,7 +161,7 @@
                         {{ __('Dashboard Operator') }}
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('ticket-check.index')" :active="request()->routeIs('ticket-check.*')">
-                        {{ __('Verifikasi Tiket') }}
+                        {{ __('Verify Ticket') }}
                     </x-responsive-nav-link>
                 @endif
 
@@ -196,14 +211,22 @@
             <div class="pt-4 pb-1 border-t border-gray-200">
                 <div class="space-y-1">
                     <x-responsive-nav-link :href="route('login')">
-                        {{ __('Log in') }}
+                        {{ __('Login') }}
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('register')">
                         {{ __('Register') }}
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('operator.register')">
-                        {{ __('Daftar PO') }}
+                        {{ __('Register PO') }}
                     </x-responsive-nav-link>
+                    <!-- Language Switcher Mobile -->
+                    <div class="px-4 py-2 border-t mt-2">
+                        <p class="text-xs text-gray-500 mb-2">Language</p>
+                        <div class="flex space-x-2">
+                            <a href="{{ route('language.switch', 'id') }}" class="px-3 py-1 text-sm rounded {{ app()->getLocale() === 'id' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700' }}">🇮🇩 ID</a>
+                            <a href="{{ route('language.switch', 'en') }}" class="px-3 py-1 text-sm rounded {{ app()->getLocale() === 'en' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700' }}">🇬🇧 EN</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         @endauth
