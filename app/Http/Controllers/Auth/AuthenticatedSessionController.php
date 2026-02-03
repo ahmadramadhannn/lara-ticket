@@ -28,7 +28,24 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('home', absolute: false));
+        // Role-based redirect
+        $user = Auth::user();
+
+        // Super Admin goes to admin dashboard
+        if ($user->hasRole('super_admin')) {
+            return redirect()->intended(route('super-admin.dashboard'));
+        }
+
+        // Operator goes to operator dashboard (or pending page if not approved)
+        if ($user->hasRole('operator')) {
+            if ($user->busOperator && $user->busOperator->approval_status === 'approved') {
+                return redirect()->intended(route('operator.dashboard'));
+            }
+            return redirect()->route('operator.pending');
+        }
+
+        // Buyers/Passengers go to home page
+        return redirect()->intended(route('home'));
     }
 
     /**
