@@ -2,11 +2,15 @@
 
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\Operator\BusController;
 use App\Http\Controllers\Operator\OperatorRegistrationController;
+use App\Http\Controllers\Operator\ScheduleController as OperatorScheduleController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\SuperAdmin\RouteController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
+use App\Http\Controllers\SuperAdmin\TerminalController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
@@ -83,7 +87,13 @@ Route::middleware(['auth', 'role:operator', 'operator.approved'])->prefix('opera
     Route::get('/dashboard', function () {
         return view('operator.dashboard');
     })->name('dashboard');
-    // TODO: Add schedule and bus management routes
+    
+    // Bus Management
+    Route::resource('buses', BusController::class)->except(['show']);
+    
+    // Schedule Management
+    Route::resource('schedules', OperatorScheduleController::class)->except(['show']);
+    Route::post('/schedules/bulk-create', [OperatorScheduleController::class, 'bulkCreate'])->name('schedules.bulk-create');
 });
 
 /*
@@ -94,20 +104,21 @@ Route::middleware(['auth', 'role:operator', 'operator.approved'])->prefix('opera
 
 Route::middleware(['auth', 'role:super_admin'])->prefix('super-admin')->name('super-admin.')->group(function () {
     Route::get('/dashboard', [SuperAdminController::class, 'dashboard'])->name('dashboard');
+    
+    // Operator Registrations
     Route::get('/registrations', [SuperAdminController::class, 'registrations'])->name('registrations');
     Route::get('/registrations/{operator}', [SuperAdminController::class, 'showRegistration'])->name('registrations.show');
     Route::post('/registrations/{operator}/approve', [SuperAdminController::class, 'approve'])->name('approve');
     Route::post('/registrations/{operator}/reject', [SuperAdminController::class, 'reject'])->name('reject');
     
-    // Terminals CRUD - TODO
-    Route::get('/terminals', function () {
-        return view('super-admin.terminals.index');
-    })->name('terminals.index');
+    // Terminals CRUD
+    Route::resource('terminals', TerminalController::class)->except(['show']);
     
-    // Operators CRUD - TODO
-    Route::get('/operators', function () {
-        return view('super-admin.operators.index');
-    })->name('operators.index');
+    // Routes CRUD
+    Route::resource('routes', RouteController::class)->except(['show']);
+    
+    // Operators List (view only)
+    Route::get('/operators', [SuperAdminController::class, 'operators'])->name('operators.index');
 });
 
 /*

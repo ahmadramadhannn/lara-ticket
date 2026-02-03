@@ -106,4 +106,18 @@ class SuperAdminController extends Controller
         return redirect()->route('super-admin.registrations')
             ->with('success', "PO '{$operator->name}' ditolak.");
     }
+
+    /**
+     * Show the list of all approved operators.
+     */
+    public function operators(): View
+    {
+        $operators = BusOperator::approved()
+            ->with('submittedBy')
+            ->withCount('buses')
+            ->latest()
+            ->paginate(15);
+
+        return view('super-admin.operators.index', compact('operators'));
+    }
 }

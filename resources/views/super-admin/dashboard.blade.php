@@ -111,6 +111,18 @@
                         </svg>
                     </div>
                 </a>
+
+                <a href="{{ route('super-admin.routes.index') }}" class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md transition-shadow">
+                    <div class="p-6 flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-gray-900">{{ __('Manage Routes') }}</p>
+                            <p class="text-sm text-gray-500">{{ __('Add, edit bus routes') }}</p>
+                        </div>
+                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                </a>
             </div>
 
             <!-- Recent Pending Registrations -->
