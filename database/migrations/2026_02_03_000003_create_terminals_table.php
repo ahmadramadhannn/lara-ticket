@@ -11,8 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('flights', function (Blueprint $table) {
+        Schema::create('terminals', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('city_id')->constrained()->cascadeOnDelete();
+            $table->string('name');
+            $table->string('address')->nullable();
+            $table->string('code', 20)->unique();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
@@ -22,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('flights');
+        Schema::dropIfExists('terminals');
     }
 };
