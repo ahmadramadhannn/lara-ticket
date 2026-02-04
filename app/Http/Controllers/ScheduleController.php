@@ -104,4 +104,45 @@ class ScheduleController extends Controller
 
         return view('schedules.show', compact('schedule', 'bookedSeats', 'seatLayout'));
     }
+
+    /**
+     * Get available destinations for a given origin terminal.
+     */
+    public function getDestinations(Terminal $terminal)
+    {
+        // Get all routes from this origin terminal that have future schedules
+        $destinationIds = Schedule::query()
+            ->where('departure_time', '>', now())
+            ->where('status', 'scheduled')
+            ->whereHas('route', function ($q) use ($terminal) {
+                $q->where('origin_terminal_id', $terminal->id);
+            })
+            ->with('route')
+            ->get()
+            ->pluck('route.destination_terminal_id')
+            ->unique()
+            ->values();
+
+        $destinations = Terminal::with('city.province')
+            ->whereIn('id', $destinationIds)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get()
+            ->groupBy('city.province.name')
+            ->map(function ($terminals, $province) {
+                return [
+                    'province' => $province,
+                    'terminals' => $terminals->map(function ($t) {
+                        return [
+                            'id' => $t->id,
+                            'name' => $t->name,
+                            'city' => $t->city->name,
+                        ];
+                    })->values(),
+                ];
+            })
+            ->values();
+
+        return response()->json($destinations);
+    }
 }

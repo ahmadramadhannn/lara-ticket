@@ -118,4 +118,54 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const originSelect = document.getElementById('origin');
+            const destinationSelect = document.getElementById('destination');
+            const originalDestinations = destinationSelect.innerHTML;
+            
+            originSelect.addEventListener('change', async function() {
+                const originId = this.value;
+                
+                if (!originId) {
+                    // Reset to all destinations
+                    destinationSelect.innerHTML = originalDestinations;
+                    return;
+                }
+                
+                // Show loading state
+                destinationSelect.innerHTML = '<option value="">{{ __("Loading...") }}</option>';
+                destinationSelect.disabled = true;
+                
+                try {
+                    const response = await fetch(`/api/destinations/${originId}`);
+                    const data = await response.json();
+                    
+                    let html = '<option value="">{{ __("Select Destination Terminal") }}</option>';
+                    
+                    if (data.length === 0) {
+                        html = '<option value="">{{ __("No destinations available") }}</option>';
+                    } else {
+                        data.forEach(group => {
+                            html += `<optgroup label="${group.province}">`;
+                            group.terminals.forEach(terminal => {
+                                html += `<option value="${terminal.id}">${terminal.name} (${terminal.city})</option>`;
+                            });
+                            html += '</optgroup>';
+                        });
+                    }
+                    
+                    destinationSelect.innerHTML = html;
+                } catch (error) {
+                    console.error('Error fetching destinations:', error);
+                    destinationSelect.innerHTML = originalDestinations;
+                } finally {
+                    destinationSelect.disabled = false;
+                }
+            });
+        });
+    </script>
+    @endpush
 </x-app-layout>

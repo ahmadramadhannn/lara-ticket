@@ -28,6 +28,7 @@ Route::get('/language/{locale}', [LanguageController::class, 'switch'])->name('l
 Route::get('/', [ScheduleController::class, 'index'])->name('home');
 Route::get('/schedules', [ScheduleController::class, 'search'])->name('schedules.search');
 Route::get('/schedules/{schedule}', [ScheduleController::class, 'show'])->name('schedules.show');
+Route::get('/api/destinations/{terminal}', [ScheduleController::class, 'getDestinations'])->name('api.destinations');
 
 /*
 |--------------------------------------------------------------------------
