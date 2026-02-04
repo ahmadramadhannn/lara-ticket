@@ -25,7 +25,7 @@ class OperatorPanelProvider extends PanelProvider
         return $panel
             ->id('operator')
             ->path('operator')
-            ->login()
+            ->authGuard('web')
             ->brandName('LaraTicket Operator')
             ->colors([
                 'primary' => Color::Emerald,

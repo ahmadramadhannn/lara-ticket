@@ -25,7 +25,7 @@ class SuperAdminPanelProvider extends PanelProvider
         return $panel
             ->id('super-admin')
             ->path('super-admin')
-            ->login()
+            ->authGuard('web')
             ->brandName('LaraTicket Admin')
             ->colors([
                 'primary' => Color::Indigo,
