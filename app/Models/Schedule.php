@@ -27,7 +27,7 @@ class Schedule extends Model
         return [
             'departure_time' => 'datetime',
             'arrival_time' => 'datetime',
-            'base_price' => 'decimal:2',
+            'base_price' => 'float',
         ];
     }
 
