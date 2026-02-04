@@ -7,9 +7,9 @@
                 <div class="shrink-0 flex items-center">
                     @auth
                         @if(Auth::user()->isSuperAdmin())
-                            <a href="{{ route('super-admin.dashboard') }}">
+                            <a href="{{ url('/super-admin') }}">
                         @elseif(Auth::user()->isOperator() && Auth::user()->hasApprovedOperator())
-                            <a href="{{ route('operator.dashboard') }}">
+                            <a href="{{ url('/operator') }}">
                         @else
                             <a href="{{ route('home') }}">
                         @endif
@@ -35,7 +35,7 @@
                         @endif
 
                         @if(Auth::user()->isOperator() && Auth::user()->hasApprovedOperator())
-                            <x-nav-link :href="route('operator.dashboard')" :active="request()->routeIs('operator.*')">
+                            <x-nav-link :href="url('/operator')" :active="request()->routeIs('operator.*')">
                                 {{ __('Dashboard Operator') }}
                             </x-nav-link>
                             <x-nav-link :href="route('ticket-check.index')" :active="request()->routeIs('ticket-check.*')">
@@ -44,7 +44,7 @@
                         @endif
 
                         @if(Auth::user()->isSuperAdmin())
-                            <x-nav-link :href="route('super-admin.dashboard')" :active="request()->routeIs('super-admin.*')">
+                            <x-nav-link :href="url('/super-admin')" :active="request()->routeIs('super-admin.*')">
                                 {{ __('Dashboard Admin') }}
                             </x-nav-link>
                         @endif
@@ -85,13 +85,13 @@
                             </x-dropdown-link>
 
                             @if(Auth::user()->isOperator() && Auth::user()->hasApprovedOperator())
-                                <x-dropdown-link :href="route('operator.dashboard')">
+                                <x-dropdown-link :href="url('/operator')">
                                     {{ __('Dashboard Operator') }}
                                 </x-dropdown-link>
                             @endif
 
                             @if(Auth::user()->isSuperAdmin())
-                                <x-dropdown-link :href="route('super-admin.dashboard')">
+                                <x-dropdown-link :href="url('/super-admin')">
                                     {{ __('Dashboard Admin') }}
                                 </x-dropdown-link>
                             @endif
@@ -168,7 +168,7 @@
                 @endif
 
                 @if(Auth::user()->isOperator() && Auth::user()->hasApprovedOperator())
-                    <x-responsive-nav-link :href="route('operator.dashboard')" :active="request()->routeIs('operator.*')">
+                    <x-responsive-nav-link :href="url('/operator')" :active="request()->routeIs('operator.*')">
                         {{ __('Dashboard Operator') }}
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('ticket-check.index')" :active="request()->routeIs('ticket-check.*')">
@@ -177,7 +177,7 @@
                 @endif
 
                 @if(Auth::user()->isSuperAdmin())
-                    <x-responsive-nav-link :href="route('super-admin.dashboard')" :active="request()->routeIs('super-admin.*')">
+                    <x-responsive-nav-link :href="url('/super-admin')" :active="request()->routeIs('super-admin.*')">
                         {{ __('Dashboard Admin') }}
                     </x-responsive-nav-link>
                 @endif
