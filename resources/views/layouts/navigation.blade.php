@@ -22,12 +22,13 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('home')" :active="request()->routeIs('home')">
-                        {{ __('Search Tickets') }}
-                    </x-nav-link>
+
                     
                     @auth
                         @if(Auth::user()->isBuyer())
+                            <x-nav-link :href="route('home')" :active="request()->routeIs('home')">
+                                {{ __('Search Tickets') }}
+                            </x-nav-link>
                             <x-nav-link :href="route('tickets.index')" :active="request()->routeIs('tickets.*')">
                                 {{ __('My Tickets') }}
                             </x-nav-link>

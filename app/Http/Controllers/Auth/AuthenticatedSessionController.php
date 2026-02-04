@@ -31,15 +31,15 @@ class AuthenticatedSessionController extends Controller
         // Role-based redirect
         $user = Auth::user();
 
-        // Super Admin goes to admin dashboard
+        // Super Admin goes to Filament admin panel
         if ($user->hasRole('super_admin')) {
-            return redirect()->intended(route('super-admin.dashboard'));
+            return redirect()->intended('/super-admin');
         }
 
-        // Operator goes to operator dashboard (or pending page if not approved)
+        // Operator goes to Filament operator panel (or pending page if not approved)
         if ($user->hasRole('operator')) {
             if ($user->busOperator && $user->busOperator->approval_status === 'approved') {
-                return redirect()->intended(route('operator.dashboard'));
+                return redirect()->intended('/operator');
             }
             return redirect()->route('operator.pending');
         }

@@ -83,43 +83,52 @@ Route::middleware('auth')->prefix('operator')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:operator', 'operator.approved'])->prefix('operator')->name('operator.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('operator.dashboard');
-    })->name('dashboard');
-    
-    // Bus Management
-    Route::resource('buses', BusController::class)->except(['show']);
-    
-    // Schedule Management
-    Route::resource('schedules', OperatorScheduleController::class)->except(['show']);
-    Route::post('/schedules/bulk-create', [OperatorScheduleController::class, 'bulkCreate'])->name('schedules.bulk-create');
-});
+/*
+|--------------------------------------------------------------------------
+| Operator Routes - LEGACY (Now handled by Filament at /operator)
+|--------------------------------------------------------------------------
+| These routes are commented out as Filament now handles the operator dashboard.
+| The old Blade views are kept for reference but Filament provides a better UI.
+*/
+
+// Route::middleware(['auth', 'role:operator', 'operator.approved'])->prefix('operator')->name('operator.')->group(function () {
+//     Route::get('/dashboard', function () {
+//         return view('operator.dashboard');
+//     })->name('dashboard');
+//     
+//     // Bus Management
+//     Route::resource('buses', BusController::class)->except(['show']);
+//     
+//     // Schedule Management
+//     Route::resource('schedules', OperatorScheduleController::class)->except(['show']);
+//     Route::post('/schedules/bulk-create', [OperatorScheduleController::class, 'bulkCreate'])->name('schedules.bulk-create');
+// });
 
 /*
 |--------------------------------------------------------------------------
-| Super Admin Routes
+| Super Admin Routes - LEGACY (Now handled by Filament at /super-admin)
 |--------------------------------------------------------------------------
+| These routes are commented out as Filament now handles the super admin dashboard.
 */
 
-Route::middleware(['auth', 'role:super_admin'])->prefix('super-admin')->name('super-admin.')->group(function () {
-    Route::get('/dashboard', [SuperAdminController::class, 'dashboard'])->name('dashboard');
-    
-    // Operator Registrations
-    Route::get('/registrations', [SuperAdminController::class, 'registrations'])->name('registrations');
-    Route::get('/registrations/{operator}', [SuperAdminController::class, 'showRegistration'])->name('registrations.show');
-    Route::post('/registrations/{operator}/approve', [SuperAdminController::class, 'approve'])->name('approve');
-    Route::post('/registrations/{operator}/reject', [SuperAdminController::class, 'reject'])->name('reject');
-    
-    // Terminals CRUD
-    Route::resource('terminals', TerminalController::class)->except(['show']);
-    
-    // Routes CRUD
-    Route::resource('routes', RouteController::class)->except(['show']);
-    
-    // Operators List (view only)
-    Route::get('/operators', [SuperAdminController::class, 'operators'])->name('operators.index');
-});
+// Route::middleware(['auth', 'role:super_admin'])->prefix('super-admin')->name('super-admin.')->group(function () {
+//     Route::get('/dashboard', [SuperAdminController::class, 'dashboard'])->name('dashboard');
+//     
+//     // Operator Registrations
+//     Route::get('/registrations', [SuperAdminController::class, 'registrations'])->name('registrations');
+//     Route::get('/registrations/{operator}', [SuperAdminController::class, 'showRegistration'])->name('registrations.show');
+//     Route::post('/registrations/{operator}/approve', [SuperAdminController::class, 'approve'])->name('approve');
+//     Route::post('/registrations/{operator}/reject', [SuperAdminController::class, 'reject'])->name('reject');
+//     
+//     // Terminals CRUD
+//     Route::resource('terminals', TerminalController::class)->except(['show']);
+//     
+//     // Routes CRUD
+//     Route::resource('routes', RouteController::class)->except(['show']);
+//     
+//     // Operators List (view only)
+//     Route::get('/operators', [SuperAdminController::class, 'operators'])->name('operators.index');
+// });
 
 /*
 |--------------------------------------------------------------------------

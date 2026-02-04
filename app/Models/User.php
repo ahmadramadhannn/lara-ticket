@@ -3,13 +3,15 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -121,5 +123,21 @@ class User extends Authenticatable
         return $this->isOperator() 
             && $this->busOperator 
             && $this->busOperator->isApproved();
+    }
+
+    // Filament Panel Access
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return match ($panel->getId()) {
+            'super-admin' => $this->isSuperAdmin(),
+            'operator' => $this->isOperator() && $this->hasApprovedOperator(),
+            default => false,
+        };
+    }
+
+    public function hasRole(string $role): bool
+    {
+        return $this->role === $role;
     }
 }
