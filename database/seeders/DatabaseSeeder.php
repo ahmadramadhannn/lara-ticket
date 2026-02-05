@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             BusOperatorSeeder::class,
             RouteScheduleSeeder::class,
             SampleBookingSeeder::class,
+            NewRoleSeeder::class,
         ]);
     }
 }

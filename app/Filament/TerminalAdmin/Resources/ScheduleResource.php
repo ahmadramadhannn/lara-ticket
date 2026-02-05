@@ -37,8 +37,15 @@ class ScheduleResource extends Resource
                   ->orWhereIn('destination_terminal_id', $terminalIds);
         })->pluck('id')->toArray();
         
-        return parent::getEloquentQuery()
+        $query = parent::getEloquentQuery()
             ->whereIn('route_id', $routeIds);
+
+        // If user is linked to a specific bus operator, only show their schedules
+        if ($user->bus_operator_id) {
+            $query->where('bus_operator_id', $user->bus_operator_id);
+        }
+
+        return $query;
     }
 
     public static function form(Form $form): Form
@@ -64,7 +71,13 @@ class ScheduleResource extends Resource
                             ->disabled(fn ($record) => $record !== null), // Can't change route on edit
                         Forms\Components\Select::make('bus_id')
                             ->label('Bus')
-                            ->relationship('bus', 'registration_number')
+                            ->relationship('bus', 'registration_number', function (Builder $query) use ($user) {
+                                // If user is linked to an operator, only show their buses
+                                if ($user->bus_operator_id) {
+                                    $query->where('bus_operator_id', $user->bus_operator_id);
+                                }
+                                return $query;
+                            })
                             ->searchable()
                             ->required()
                             ->disabled(fn ($record) => $record !== null),

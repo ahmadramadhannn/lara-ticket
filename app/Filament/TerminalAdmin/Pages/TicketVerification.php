@@ -96,6 +96,20 @@ class TicketVerification extends Page implements HasForms
             return;
         }
 
+        // If user is linked to specific operator, check if ticket belongs to that operator
+        if ($user->bus_operator_id && $schedule->bus_operator_id !== $user->bus_operator_id) {
+            $this->verificationResult = 'This ticket is not for your airline/operator.';
+            $this->resultType = 'warning';
+            $this->verifiedTicket = $ticket;
+            
+            Notification::make()
+                ->title('Wrong Operator')
+                ->body('You are not authorized to verify tickets for this operator.')
+                ->warning()
+                ->send();
+            return;
+        }
+
         // Check ticket status
         if ($ticket->status === 'used') {
             $this->verificationResult = 'Ticket already used.';

@@ -44,9 +44,16 @@ class ArrivalConfirmationResource extends Resource
             ->pluck('id')
             ->toArray();
         
-        return parent::getEloquentQuery()
+        $query = parent::getEloquentQuery()
             ->whereIn('route_id', $routeIds)
             ->where('status', '!=', 'cancelled');
+
+        // If user is linked to a specific bus operator, only show their schedules
+        if ($user->bus_operator_id) {
+            $query->where('bus_operator_id', $user->bus_operator_id);
+        }
+
+        return $query;
     }
 
     public static function form(Form $form): Form
