@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
             'operator.approved' => \App\Http\Middleware\CheckOperatorApproved::class,
+            'terminal.access' => \App\Http\Middleware\CheckTerminalAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

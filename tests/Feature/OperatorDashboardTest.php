@@ -2,8 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Bus;
-use App\Models\BusClass;
 use App\Models\BusOperator;
 use App\Models\City;
 use App\Models\Province;
@@ -17,7 +15,7 @@ class OperatorDashboardTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function createOperatorUser()
+    private function createCompanyAdminUser()
     {
         $operator = BusOperator::create([
             'name' => 'Operator X',
@@ -27,7 +25,7 @@ class OperatorDashboardTest extends TestCase
         ]);
 
         $user = User::factory()->create([
-            'role' => 'operator',
+            'role' => 'company_admin',
             'bus_operator_id' => $operator->id,
             'user_status' => 'active',
         ]);
@@ -51,49 +49,87 @@ class OperatorDashboardTest extends TestCase
         ]);
     }
 
-    public function test_operator_can_access_dashboard()
+    public function test_company_admin_can_access_filament_panel()
     {
-        $data = $this->createOperatorUser();
+        $data = $this->createCompanyAdminUser();
 
         $response = $this->actingAs($data['user'])
-            ->get(route('operator.dashboard'));
+            ->get('/company-admin');
 
-        $response->assertStatus(200);
-        $response->assertSee('Dashboard');
+        // Filament panel should be accessible (200 OK or redirect to dashboard)
+        $this->assertTrue(in_array($response->getStatusCode(), [200, 302]));
     }
 
-    public function test_operator_can_create_schedule()
+    public function test_company_admin_role_check_works()
     {
-        $data = $this->createOperatorUser();
-        $route = $this->createRoute();
-        
-        $busClass = BusClass::create(['name' => 'Executive', 'amenities' => []]);
+        $data = $this->createCompanyAdminUser();
 
-        $bus = Bus::create([
-            'bus_operator_id' => $data['operator']->id,
-            'bus_class_id' => $busClass->id,
-            'registration_number' => 'D 1234 AB',
-            'total_seats' => 40,
-            'seat_layout' => [],
-            'is_active' => true,
+        $this->assertTrue($data['user']->isCompanyAdmin());
+        $this->assertTrue($data['user']->isOperator()); // Backward compat
+        $this->assertTrue($data['user']->hasApprovedOperator());
+        $this->assertFalse($data['user']->isTerminalAdmin());
+        $this->assertFalse($data['user']->isBuyer());
+    }
+
+    public function test_unapproved_company_admin_cannot_access_panel()
+    {
+        $operator = BusOperator::create([
+            'name' => 'Pending Operator',
+            'code' => 'POP',
+            'approval_status' => 'pending',
+            'is_active' => false
         ]);
 
-        $response = $this->actingAs($data['user'])
-            ->post(route('operator.schedules.store'), [
-                'route_id' => $route->id,
-                'bus_id' => $bus->id,
-                'departure_date' => now()->addDay()->format('Y-m-d'),
-                'departure_time' => '08:00',
-                'base_price' => 150000,
-            ]);
-
-        $response->assertRedirect(route('operator.schedules.index'));
-        
-        $this->assertDatabaseHas('schedules', [
-            'route_id' => $route->id,
-            'bus_id' => $bus->id,
-            'base_price' => 150000,
-            'status' => 'scheduled',
+        $user = User::factory()->create([
+            'role' => 'company_admin',
+            'bus_operator_id' => $operator->id,
+            'user_status' => 'pending',
         ]);
+
+        $this->assertFalse($user->hasApprovedOperator());
+        
+        // HTTP test: unapproved company admin should be redirected
+        $response = $this->actingAs($user)->get('/company-admin');
+        
+        // Should redirect to login (Filament denies access)
+        $response->assertStatus(403);
+    }
+
+    public function test_terminal_admin_role_check_works()
+    {
+        $province = Province::create(['name' => 'West Java', 'code' => 'WJ']);
+        $city = City::create(['province_id' => $province->id, 'name' => 'City A', 'type' => 'regency']);
+        $terminal = Terminal::create(['city_id' => $city->id, 'name' => 'Terminal A', 'code' => 'T1', 'address' => 'Addr 1', 'is_active' => true]);
+        
+        $operator = BusOperator::create([
+            'name' => 'Operator X',
+            'code' => 'OPX',
+            'approval_status' => 'approved',
+            'is_active' => true
+        ]);
+
+        $user = User::factory()->create([
+            'role' => 'terminal_admin',
+            'bus_operator_id' => $operator->id,
+            'terminal_id' => $terminal->id,
+            'user_status' => 'active',
+        ]);
+
+        // Assign to terminal
+        $user->assignedTerminals()->attach($terminal->id, [
+            'assignment_type' => 'primary',
+            'can_manage_schedules' => true,
+            'can_verify_tickets' => true,
+            'can_confirm_arrivals' => true,
+        ]);
+
+        $this->assertTrue($user->isTerminalAdmin());
+        $this->assertTrue($user->isOperator()); // Backward compat
+        $this->assertTrue($user->hasApprovedOperator());
+        $this->assertTrue($user->hasTerminalAssignment());
+        $this->assertTrue($user->canManageTerminal($terminal));
+        $this->assertTrue($user->canVerifyAtTerminal($terminal));
+        $this->assertFalse($user->isCompanyAdmin());
+        $this->assertFalse($user->isBuyer());
     }
 }

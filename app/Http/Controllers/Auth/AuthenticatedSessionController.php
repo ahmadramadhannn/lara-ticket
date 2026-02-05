@@ -32,14 +32,22 @@ class AuthenticatedSessionController extends Controller
         $user = Auth::user();
 
         // Super Admin goes to Filament admin panel
-        if ($user->hasRole('super_admin')) {
+        if ($user->isSuperAdmin()) {
             return redirect()->intended('/super-admin');
         }
 
-        // Operator goes to Filament operator panel (or pending page if not approved)
-        if ($user->hasRole('operator')) {
-            if ($user->busOperator && $user->busOperator->approval_status === 'approved') {
-                return redirect()->intended('/operator');
+        // Company Admin goes to Filament company admin panel (or pending page if not approved)
+        if ($user->isCompanyAdmin()) {
+            if ($user->hasApprovedOperator()) {
+                return redirect()->intended('/company-admin');
+            }
+            return redirect()->route('operator.pending');
+        }
+
+        // Terminal Admin goes to Filament terminal admin panel (or pending page if not approved)
+        if ($user->isTerminalAdmin()) {
+            if ($user->hasApprovedOperator() && $user->hasTerminalAssignment()) {
+                return redirect()->intended('/terminal-admin');
             }
             return redirect()->route('operator.pending');
         }

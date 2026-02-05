@@ -20,8 +20,8 @@ class CheckOperatorApproved
             return redirect()->route('login');
         }
 
-        // Only check for operators
-        if ($user->role !== 'operator') {
+        // Only check for operators (company_admin or terminal_admin)
+        if (!$user->isOperator()) {
             return $next($request);
         }
 

@@ -7,6 +7,7 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -28,6 +29,7 @@ class User extends Authenticatable implements FilamentUser
         'role',
         'phone',
         'bus_operator_id',
+        'terminal_id',
         'user_status',
     ];
 
@@ -54,7 +56,9 @@ class User extends Authenticatable implements FilamentUser
         ];
     }
 
+    // =========================================================================
     // Relationships
+    // =========================================================================
 
     public function tickets(): HasMany
     {
@@ -71,16 +75,41 @@ class User extends Authenticatable implements FilamentUser
         return $this->belongsTo(BusOperator::class);
     }
 
-    // Role checks
+    /**
+     * Primary terminal for terminal_admin (quick access).
+     */
+    public function primaryTerminal(): BelongsTo
+    {
+        return $this->belongsTo(Terminal::class, 'terminal_id');
+    }
+
+    /**
+     * All terminals assigned to this terminal_admin (many-to-many).
+     */
+    public function assignedTerminals(): BelongsToMany
+    {
+        return $this->belongsToMany(Terminal::class, 'terminal_user')
+            ->withPivot(['assignment_type', 'can_manage_schedules', 'can_verify_tickets', 'can_confirm_arrivals'])
+            ->withTimestamps();
+    }
+
+    // =========================================================================
+    // Role Checks
+    // =========================================================================
 
     public function isSuperAdmin(): bool
     {
         return $this->role === 'super_admin';
     }
 
-    public function isOperator(): bool
+    public function isCompanyAdmin(): bool
     {
-        return $this->role === 'operator';
+        return $this->role === 'company_admin';
+    }
+
+    public function isTerminalAdmin(): bool
+    {
+        return $this->role === 'terminal_admin';
     }
 
     public function isBuyer(): bool
@@ -88,18 +117,39 @@ class User extends Authenticatable implements FilamentUser
         return $this->role === 'buyer';
     }
 
-    // Backward compatibility
+    /**
+     * Check if user is any type of operator (company or terminal level).
+     * Backward compatibility method.
+     */
+    public function isOperator(): bool
+    {
+        return $this->isCompanyAdmin() || $this->isTerminalAdmin();
+    }
+
+    /**
+     * Backward compatibility: Admin means super_admin or any operator role.
+     */
     public function isAdmin(): bool
     {
         return $this->isSuperAdmin() || $this->isOperator();
     }
 
+    /**
+     * Backward compatibility: Verifiers are terminal admins or company admins.
+     */
     public function isVerifier(): bool
     {
         return $this->isOperator();
     }
 
-    // Status checks
+    public function hasRole(string $role): bool
+    {
+        return $this->role === $role;
+    }
+
+    // =========================================================================
+    // Status Checks
+    // =========================================================================
 
     public function isActive(): bool
     {
@@ -116,28 +166,104 @@ class User extends Authenticatable implements FilamentUser
         return $this->user_status === 'suspended';
     }
 
-    // Operator-specific checks
+    // =========================================================================
+    // Company & Terminal Specific Checks
+    // =========================================================================
 
+    /**
+     * Check if user's bus operator company is approved.
+     * Works for both company_admin and terminal_admin.
+     */
     public function hasApprovedOperator(): bool
     {
-        return $this->isOperator() 
-            && $this->busOperator 
-            && $this->busOperator->isApproved();
+        return $this->busOperator && $this->busOperator->isApproved();
     }
 
+    /**
+     * Check if terminal_admin has at least one terminal assignment.
+     */
+    public function hasTerminalAssignment(): bool
+    {
+        return $this->assignedTerminals()->exists();
+    }
+
+    /**
+     * Check if user can manage schedules at a specific terminal.
+     */
+    public function canManageTerminal(Terminal $terminal): bool
+    {
+        // Super admins can manage any terminal
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
+        // Company admins can manage all terminals for their company's routes
+        if ($this->isCompanyAdmin() && $this->hasApprovedOperator()) {
+            return true;
+        }
+
+        // Terminal admins must be explicitly assigned
+        if ($this->isTerminalAdmin()) {
+            return $this->assignedTerminals()
+                ->where('terminals.id', $terminal->id)
+                ->wherePivot('can_manage_schedules', true)
+                ->exists();
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if user can verify tickets at a specific terminal.
+     */
+    public function canVerifyAtTerminal(Terminal $terminal): bool
+    {
+        if ($this->isSuperAdmin() || $this->isCompanyAdmin()) {
+            return true;
+        }
+
+        if ($this->isTerminalAdmin()) {
+            return $this->assignedTerminals()
+                ->where('terminals.id', $terminal->id)
+                ->wherePivot('can_verify_tickets', true)
+                ->exists();
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if user can confirm arrivals at a destination terminal.
+     */
+    public function canConfirmArrivalsAt(Terminal $terminal): bool
+    {
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
+        if ($this->isTerminalAdmin()) {
+            return $this->assignedTerminals()
+                ->where('terminals.id', $terminal->id)
+                ->wherePivot('can_confirm_arrivals', true)
+                ->exists();
+        }
+
+        return false;
+    }
+
+    // =========================================================================
     // Filament Panel Access
+    // =========================================================================
 
     public function canAccessPanel(Panel $panel): bool
     {
         return match ($panel->getId()) {
             'super-admin' => $this->isSuperAdmin(),
-            'operator' => $this->isOperator() && $this->hasApprovedOperator(),
+            'company-admin' => $this->isCompanyAdmin() && $this->hasApprovedOperator(),
+            'terminal-admin' => $this->isTerminalAdmin() && $this->hasApprovedOperator() && $this->hasTerminalAssignment(),
+            // Legacy support: redirect old 'operator' panel access to company-admin
+            'operator' => $this->isCompanyAdmin() && $this->hasApprovedOperator(),
             default => false,
         };
-    }
-
-    public function hasRole(string $role): bool
-    {
-        return $this->role === $role;
     }
 }

@@ -133,11 +133,11 @@ Route::middleware('auth')->prefix('operator')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Verifier Routes (Operators can verify tickets)
+| Verifier Routes (Company admins and terminal admins can verify tickets)
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:operator,super_admin'])->prefix('ticket-check')->group(function () {
+Route::middleware(['auth', 'role:company_admin,terminal_admin,super_admin'])->prefix('ticket-check')->group(function () {
     Route::get('/', [VerificationController::class, 'index'])->name('ticket-check.index');
     Route::post('/', [VerificationController::class, 'verify'])->name('ticket-check.verify');
     Route::post('/mark-used/{ticket}', [VerificationController::class, 'markUsed'])->name('ticket-check.markUsed');
@@ -149,7 +149,7 @@ Route::middleware(['auth', 'role:operator,super_admin'])->prefix('ticket-check')
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth:sanctum', 'role:operator,super_admin'])->prefix('api')->group(function () {
+Route::middleware(['auth:sanctum', 'role:company_admin,terminal_admin,super_admin'])->prefix('api')->group(function () {
     Route::post('/verify-ticket', [VerificationController::class, 'apiVerify']);
 });
 

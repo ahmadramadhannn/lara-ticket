@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Terminal extends Model
@@ -44,5 +45,39 @@ class Terminal extends Model
     public function getFullNameAttribute(): string
     {
         return "{$this->name}, {$this->city->name}";
+    }
+
+    /**
+     * All terminal admins assigned to this terminal.
+     */
+    public function admins(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'terminal_user')
+            ->withPivot(['assignment_type', 'can_manage_schedules', 'can_verify_tickets', 'can_confirm_arrivals'])
+            ->withTimestamps();
+    }
+
+    /**
+     * Only active terminal admins.
+     */
+    public function activeAdmins(): BelongsToMany
+    {
+        return $this->admins()->where('user_status', 'active');
+    }
+
+    /**
+     * Admins who can manage schedules at this terminal.
+     */
+    public function scheduleManagers(): BelongsToMany
+    {
+        return $this->admins()->wherePivot('can_manage_schedules', true);
+    }
+
+    /**
+     * Admins who can verify tickets at this terminal.
+     */
+    public function ticketVerifiers(): BelongsToMany
+    {
+        return $this->admins()->wherePivot('can_verify_tickets', true);
     }
 }

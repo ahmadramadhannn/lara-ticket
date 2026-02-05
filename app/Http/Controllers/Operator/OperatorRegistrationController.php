@@ -56,13 +56,13 @@ class OperatorRegistrationController extends Controller
                 'approval_status' => 'pending',
             ]);
 
-            // Create the user as operator with pending status
+            // Create the user as company admin with pending status
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'phone' => $request->phone,
-                'role' => 'operator',
+                'role' => 'company_admin',
                 'user_status' => 'pending',
                 'bus_operator_id' => $busOperator->id,
             ]);
