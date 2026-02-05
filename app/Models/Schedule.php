@@ -20,6 +20,10 @@ class Schedule extends Model
         'base_price',
         'available_seats',
         'status',
+        'arrival_status',
+        'confirmed_by',
+        'confirmed_at',
+        'confirmation_notes',
     ];
 
     protected function casts(): array
@@ -28,7 +32,34 @@ class Schedule extends Model
             'departure_time' => 'datetime',
             'arrival_time' => 'datetime',
             'base_price' => 'float',
+            'confirmed_at' => 'datetime',
         ];
+    }
+
+    // Arrival confirmation methods
+    public function confirmArrival(User $user, ?string $notes = null): void
+    {
+        $this->update([
+            'arrival_status' => 'confirmed',
+            'confirmed_by' => $user->id,
+            'confirmed_at' => now(),
+            'confirmation_notes' => $notes,
+        ]);
+    }
+
+    public function rejectArrival(User $user, ?string $notes = null): void
+    {
+        $this->update([
+            'arrival_status' => 'rejected',
+            'confirmed_by' => $user->id,
+            'confirmed_at' => now(),
+            'confirmation_notes' => $notes,
+        ]);
+    }
+
+    public function confirmedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'confirmed_by');
     }
 
     public function route(): BelongsTo

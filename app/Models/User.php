@@ -30,6 +30,7 @@ class User extends Authenticatable implements FilamentUser
         'phone',
         'bus_operator_id',
         'terminal_id',
+        'invited_by',
         'user_status',
     ];
 
@@ -91,6 +92,22 @@ class User extends Authenticatable implements FilamentUser
         return $this->belongsToMany(Terminal::class, 'terminal_user')
             ->withPivot(['assignment_type', 'can_manage_schedules', 'can_verify_tickets', 'can_confirm_arrivals'])
             ->withTimestamps();
+    }
+
+    /**
+     * The company admin who invited this terminal admin.
+     */
+    public function invitedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'invited_by');
+    }
+
+    /**
+     * Terminal admins invited by this user.
+     */
+    public function invitedAdmins(): HasMany
+    {
+        return $this->hasMany(User::class, 'invited_by');
     }
 
     // =========================================================================
