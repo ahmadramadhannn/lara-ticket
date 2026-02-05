@@ -199,6 +199,10 @@ class ScheduleResource extends Resource
                         // Can only edit if schedule originates from user's terminal
                         return in_array($record->route->origin_terminal_id, $terminalIds);
                     }),
+                Tables\Actions\DeleteAction::make()
+                    ->visible(function (Schedule $record) use ($terminalIds) {
+                         return in_array($record->route->origin_terminal_id, $terminalIds);
+                    }),
                 Tables\Actions\Action::make('mark_departed')
                     ->icon('heroicon-o-truck')
                     ->color('warning')
@@ -212,7 +216,11 @@ class ScheduleResource extends Resource
                     ->visible(fn (Schedule $record) => $record->status === 'departed')
                     ->action(fn (Schedule $record) => $record->update(['status' => 'arrived'])),
             ])
-            ->bulkActions([]);
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
     }
 
     public static function getRelations(): array
