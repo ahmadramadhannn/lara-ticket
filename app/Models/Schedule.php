@@ -91,4 +91,24 @@ class Schedule extends Model
     {
         return $query->where('bus_operator_id', $operatorId);
     }
+
+    public function scopePriceRange($query, $minPrice = null, $maxPrice = null)
+    {
+        if ($minPrice !== null) {
+            $query->where('base_price', '>=', $minPrice);
+        }
+
+        if ($maxPrice !== null) {
+            $query->where('base_price', '<=', $maxPrice);
+        }
+
+        return $query;
+    }
+
+    public function scopeByBusClass($query, array $classIds)
+    {
+        return $query->whereHas('bus', function ($q) use ($classIds) {
+            $q->whereIn('bus_class_id', $classIds);
+        });
+    }
 }

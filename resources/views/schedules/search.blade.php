@@ -24,6 +24,73 @@
                 </div>
             </div>
 
+            <!-- Filters Panel -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-4 mb-6">
+                <details class="group" open>
+                    <summary class="flex cursor-pointer items-center justify-between font-semibold text-gray-800">
+                        <span>🔍 {{ __('Filter Results') }}</span>
+                        <span class="ml-2 text-gray-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    
+                    <form method="GET" action="{{ route('schedules.search') }}" class="mt-4">
+                        <!-- Preserve search parameters -->
+                        <input type="hidden" name="origin" value="{{ $origin->id }}">
+                        <input type="hidden" name="destination" value="{{ $destination->id }}">
+                        <input type="hidden" name="date" value="{{ $date->format('Y-m-d') }}">
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- Price Range -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('Price Range') }}</label>
+                                <div class="flex items-center space-x-2">
+                                    <input type="number" 
+                                           name="min_price" 
+                                           value="{{ $activeFilters['min_price'] ?? '' }}"
+                                           placeholder="Min"
+                                           min="0"
+                                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+                                    <span class="text-gray-400">-</span>
+                                    <input type="number" 
+                                           name="max_price" 
+                                           value="{{ $activeFilters['max_price'] ?? '' }}"
+                                           placeholder="Max"
+                                           min="0"
+                                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+                                </div>
+                            </div>
+
+                            <!-- Bus Class -->
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('Bus Class') }}</label>
+                                <div class="flex flex-wrap gap-3">
+                                    @foreach($busClasses as $busClass)
+                                        <label class="inline-flex items-center">
+                                            <input type="checkbox" 
+                                                   name="bus_class[]" 
+                                                   value="{{ $busClass->id }}"
+                                                   {{ in_array($busClass->id, $activeFilters['bus_class'] ?? []) ? 'checked' : '' }}
+                                                   class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                            <span class="ml-2 text-sm text-gray-700">{{ $busClass->name }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 flex items-center space-x-3">
+                            <button type="submit"
+                                    class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
+                                {{ __('Apply Filters') }}
+                            </button>
+                            <a href="{{ route('schedules.search', ['origin' => $origin->id, 'destination' => $destination->id, 'date' => $date->format('Y-m-d')]) }}"
+                               class="px-4 py-2 text-gray-600 text-sm font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition">
+                                {{ __('Clear Filters') }}
+                            </a>
+                        </div>
+                    </form>
+                </details>
+            </div>
+
             <!-- Results -->
             @if($schedules->isEmpty())
                 <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">

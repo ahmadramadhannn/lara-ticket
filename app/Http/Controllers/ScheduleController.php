@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BusClass;
 use App\Models\Schedule;
 use App\Models\Terminal;
 use App\Models\BusOperator;
@@ -38,6 +39,10 @@ class ScheduleController extends Controller
             'destination' => 'required|exists:terminals,id|different:origin',
             'date' => 'required|date|after_or_equal:today',
             'operator' => 'nullable|exists:bus_operators,id',
+            'min_price' => 'nullable|numeric|min:0',
+            'max_price' => 'nullable|numeric|min:0',
+            'bus_class' => 'nullable|array',
+            'bus_class.*' => 'exists:bus_classes,id',
         ]);
 
         $origin = Terminal::with('city')->find($request->origin);
@@ -55,8 +60,19 @@ class ScheduleController extends Controller
             ->toTerminal($request->destination)
             ->forDate($date);
 
+        // Apply operator filter
         if ($request->filled('operator')) {
             $query->byOperator($request->operator);
+        }
+
+        // Apply price range filter
+        if ($request->filled('min_price') || $request->filled('max_price')) {
+            $query->priceRange($request->min_price, $request->max_price);
+        }
+
+        // Apply bus class filter
+        if ($request->filled('bus_class')) {
+            $query->byBusClass($request->bus_class);
         }
 
         $schedules = $query->orderBy('departure_time')->get();
@@ -71,15 +87,27 @@ class ScheduleController extends Controller
             ->orderBy('name')
             ->get();
 
+        $busClasses = BusClass::orderBy('id')->get();
+
+        // Track active filters for the view
+        $activeFilters = [
+            'min_price' => $request->min_price,
+            'max_price' => $request->max_price,
+            'bus_class' => $request->bus_class ?? [],
+        ];
+
         return view('schedules.search', compact(
             'schedules',
             'origin',
             'destination',
             'date',
             'terminals',
-            'operators'
+            'operators',
+            'busClasses',
+            'activeFilters'
         ));
     }
+
 
     /**
      * Show schedule details.
