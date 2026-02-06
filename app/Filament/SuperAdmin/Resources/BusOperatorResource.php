@@ -131,6 +131,14 @@ class BusOperatorResource extends Resource
                             $record->submittedBy->update(['user_status' => 'active']);
                         }
 
+                        // Log the approval
+                        \App\Models\ActivityLog::log(
+                            action: 'approved',
+                            subjectType: 'BusOperator',
+                            subjectId: $record->id,
+                            description: "Approved operator registration: {$record->name} ({$record->code})"
+                        );
+
                         Notification::make()
                             ->title('Operator Approved')
                             ->success()
@@ -144,17 +152,36 @@ class BusOperatorResource extends Resource
                     ->form([
                         Forms\Components\Textarea::make('rejection_reason')
                             ->label('Reason for rejection')
-                            ->required(),
+                            ->required()
+                            ->helperText('This reason will be recorded and can be viewed later.')
+                            ->rows(4),
                     ])
                     ->action(function (BusOperator $record, array $data) {
                         $record->update([
                             'approval_status' => 'rejected',
+                            'rejection_reason' => $data['rejection_reason'],
+                            'rejected_at' => now(),
                         ]);
+
+                        // Suspend the associated user
+                        if ($record->submittedBy) {
+                            $record->submittedBy->update(['user_status' => 'suspended']);
+                        }
+
+                        // Log the rejection
+                        \App\Models\ActivityLog::log(
+                            action: 'rejected',
+                            subjectType: 'BusOperator',
+                            subjectId: $record->id,
+                            description: "Rejected operator registration: {$record->name} ({$record->code}) - Reason: {$data['rejection_reason']}"
+                        );
 
                         Notification::make()
                             ->title('Operator Rejected')
                             ->warning()
                             ->send();
+
+                        // TODO: Send email notification to the submitter with rejection reason
                     }),
                 Tables\Actions\EditAction::make(),
             ])

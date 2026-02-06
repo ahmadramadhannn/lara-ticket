@@ -23,6 +23,8 @@ class BusOperator extends Model
         'submitted_by',
         'approved_by',
         'approved_at',
+        'rejection_reason',
+        'rejected_at',
     ];
 
     protected function casts(): array
@@ -30,6 +32,7 @@ class BusOperator extends Model
         return [
             'is_active' => 'boolean',
             'approved_at' => 'datetime',
+            'rejected_at' => 'datetime',
         ];
     }
 
@@ -58,6 +61,11 @@ class BusOperator extends Model
     public function approvedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function documents(): HasMany
+    {
+        return $this->hasMany(OperatorDocument::class);
     }
 
     // Status checks

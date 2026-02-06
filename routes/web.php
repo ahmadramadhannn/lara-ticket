@@ -36,7 +36,7 @@ Route::get('/api/destinations/{terminal}', [ScheduleController::class, 'getDesti
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('guest')->prefix('operator')->group(function () {
+Route::middleware(['guest', 'throttle:3,60'])->prefix('operator')->group(function () {
     Route::get('/register', [OperatorRegistrationController::class, 'create'])->name('operator.register');
     Route::post('/register', [OperatorRegistrationController::class, 'store'])->name('operator.register.store');
 });

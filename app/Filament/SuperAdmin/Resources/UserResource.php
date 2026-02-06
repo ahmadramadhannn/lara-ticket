@@ -130,8 +130,76 @@ class UserResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->after(function (User $record, array $data) {
+                        // Log user updates
+                        \App\Models\ActivityLog::log(
+                            action: 'updated',
+                            subjectType: 'User',
+                            subjectId: $record->id,
+                            newValues: $data,
+                            description: "Updated user: {$record->name} ({$record->email})"
+                        );
+                    }),
+                Tables\Actions\DeleteAction::make()
+                    ->before(function (Tables\Actions\DeleteAction $action, User $record) {
+                        // Safety Guard #1: Can't delete yourself
+                        if ($record->id === \Illuminate\Support\Facades\Auth::id()) {
+                            \Filament\Notifications\Notification::make()
+                                ->danger()
+                                ->title('Cannot delete yourself')
+                                ->body('You cannot delete your own account while logged in.')
+                                ->persistent()
+                                ->send();
+                            $action->cancel();
+                            return;
+                        }
+                        
+                        // Safety Guard #2: Can't delete the last active super admin
+                        if ($record->isSuperAdmin()) {
+                            $activeAdminCount = User::where('role', 'super_admin')
+                                ->where('user_status', 'active')
+                                ->count();
+                            
+                            if ($activeAdminCount <= 1) {
+                                \Filament\Notifications\Notification::make()
+                                    ->danger()
+                                    ->title('Cannot delete the last super admin')
+                                    ->body('At least one active super admin must exist in the system.')
+                                    ->persistent()
+                                    ->send();
+                                $action->cancel();
+                                return;
+                            }
+                        }
+                    })
+                    ->requiresConfirmation()
+                    ->modalHeading(fn (User $record) => 
+                        $record->isSuperAdmin() 
+                            ? '⚠️ Delete Super Admin?' 
+                            : 'Delete User?'
+                    )
+                    ->modalDescription(fn (User $record) =>
+                        $record->isSuperAdmin()
+                            ? "You are about to delete a super admin account. This action cannot be undone and will remove all access for {$record->name}."
+                            : "Are you sure you want to delete {$record->name}? This action cannot be undone."
+                    )
+                    ->modalSubmitActionLabel('Yes, Delete')
+                    ->successNotificationTitle('User deleted successfully')
+                    ->after(function (User $record) {
+                        // Log deletion
+                        \App\Models\ActivityLog::log(
+                            action: 'deleted',
+                            subjectType: 'User',
+                            subjectId: $record->id,
+                            oldValues: [
+                                'name' => $record->name,
+                                'email' => $record->email,
+                                'role' => $record->role,
+                            ],
+                            description: "Deleted user: {$record->name} ({$record->email}) with role {$record->role}"
+                        );
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
