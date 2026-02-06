@@ -194,15 +194,6 @@ class ScheduleResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make()
-                    ->visible(function (Schedule $record) use ($terminalIds) {
-                        // Can only edit if schedule originates from user's terminal
-                        return in_array($record->route->origin_terminal_id, $terminalIds);
-                    }),
-                Tables\Actions\DeleteAction::make()
-                    ->visible(function (Schedule $record) use ($terminalIds) {
-                         return in_array($record->route->origin_terminal_id, $terminalIds);
-                    }),
                 Tables\Actions\Action::make('mark_departed')
                     ->icon('heroicon-o-truck')
                     ->color('warning')
@@ -216,11 +207,7 @@ class ScheduleResource extends Resource
                     ->visible(fn (Schedule $record) => $record->status === 'departed')
                     ->action(fn (Schedule $record) => $record->update(['status' => 'arrived'])),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->bulkActions([]);
     }
 
     public static function getRelations(): array
@@ -232,8 +219,6 @@ class ScheduleResource extends Resource
     {
         return [
             'index' => Pages\ListSchedules::route('/'),
-            'create' => Pages\CreateSchedule::route('/create'),
-            'edit' => Pages\EditSchedule::route('/{record}/edit'),
         ];
     }
 }

@@ -65,13 +65,13 @@ class TerminalAdminScheduleTest extends TestCase
             ->assertSuccessful();
     }
 
-    public function test_terminal_admin_can_see_create_action()
+    public function test_terminal_admin_cannot_see_create_action()
     {
         $data = $this->createTerminalAdminUser();
         
         $this->actingAs($data['user']);
         
         Livewire::test(ListSchedules::class)
-            ->assertActionExists('create');
+            ->assertActionDoesNotExist('create');
     }
 }
