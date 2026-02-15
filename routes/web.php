@@ -21,6 +21,15 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
+// Vercel Migration Route (Hit this once after deploy)
+Route::get('/migrate', function () {
+    if (app()->environment('production')) {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        return "Migration successful: " . \Illuminate\Support\Facades\Artisan::output();
+    }
+    return "Not in production";
+});
+
 // Language switch
 Route::get('/language/{locale}', [LanguageController::class, 'switch'])->name('language.switch');
 
