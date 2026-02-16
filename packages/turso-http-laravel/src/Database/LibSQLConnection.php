@@ -227,7 +227,7 @@ class LibSQLConnection extends Connection
 
     protected function getDefaultQueryGrammar()
     {
-        ($grammar = new LibSQLQueryGrammar)->setConnection($this);
+        ($grammar = new LibSQLQueryGrammar($this))->setConnection($this);
         $this->withTablePrefix($grammar);
 
         return $grammar;
@@ -245,7 +245,7 @@ class LibSQLConnection extends Connection
      */
     protected function getDefaultSchemaGrammar()
     {
-        ($grammar = new LibSQLSchemaGrammar)->setConnection($this);
+        ($grammar = new LibSQLSchemaGrammar($this))->setConnection($this);
         $this->withTablePrefix($grammar);
 
         return $grammar;
