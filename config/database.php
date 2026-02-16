@@ -40,14 +40,6 @@ return [
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
 
-        'libsql' => [
-            'driver'   => 'libsql',
-            'url'      => env('DB_SYNC_URL', env('DB_DATABASE', '')),
-            'token'    => env('DB_AUTH_TOKEN', ''),
-            'database' => null,
-            'prefix'   => '',
-        ],
-
         'sqlite' => [
             'driver' => 'sqlite',
             'url' => env('DB_URL'),
