@@ -3,7 +3,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "vite build",
+        "build": "rm -rf vendor/turso && vite build",
         "dev": "vite",
         "test": "npm run test:frontend && php artisan test",
         "test:frontend": "vitest"
