@@ -13,19 +13,7 @@ class TursoDatabaseServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->resolving('db', function ($db) {
-            $db->extend('turso', function ($config, $name) {
-                $connector = new TursoConnector();
-                $pdo = $connector->connect($config);
-                
-                return new SQLiteConnection(
-                    $pdo, 
-                    $config['database'] ?? 'main', 
-                    $config['prefix'] ?? '', 
-                    $config
-                );
-            });
-        });
+        //
     }
 
     /**
@@ -33,6 +21,21 @@ class TursoDatabaseServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        $db = $this->app->make('db');
+
+        $driverExtension = function ($config, $name) {
+            $connector = new TursoConnector();
+            $pdo = $connector->connect($config);
+            
+            return new SQLiteConnection(
+                $pdo, 
+                $config['database'] ?? 'main', 
+                $config['prefix'] ?? '', 
+                $config
+            );
+        };
+
+        $db->extend('turso', $driverExtension);
+        $db->extend('libsql', $driverExtension);
     }
 }
