@@ -25,6 +25,7 @@
         "APP_ENV": "production",
         "APP_DEBUG": "false",
         "LOG_CHANNEL": "errorlog",
+        "DB_CONNECTION": "turso",
         "SESSION_DRIVER": "cookie",
         "CACHE_STORE": "array"
     },
