@@ -1,23 +1,20 @@
 <?php
+echo "<h1>Vercel PHP Diagnostic</h1>";
+echo "<b>Current Directory:</b> " . __DIR__ . "<br>";
+echo "<b>Parent Directory Content:</b> " . implode(', ', scandir(__DIR__ . '/..')) . "<br>";
 
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
-error_log("🐘 api/index.php: Bootstrap starting...");
+$autoload = __DIR__ . '/../vendor/autoload.php';
+echo "<b>Checking for:</b> $autoload<br>";
 
-use Illuminate\Foundation\Application;
-use Illuminate\Http\Request;
+if (file_exists($autoload)) {
+    echo "✅ Autoloader found!<br>";
+    require $autoload;
+    echo "✅ Autoloader loaded!<br>";
+} else {
+    echo "❌ Autoloader NOT found!<br>";
+}
 
-define('LARAVEL_START', microtime(true));
-
-// Register the Composer autoloader...
-error_log("🐘 api/index.php: Loading autoloader...");
-require __DIR__.'/../vendor/autoload.php';
-
-// Bootstrap Laravel and handle the request...
-error_log("🐘 api/index.php: Bootstrapping Laravel...");
-/** @var Application $app */
-$app = require_once __DIR__.'/../bootstrap/app.php';
-
-error_log("🐘 api/index.php: Handling request...");
-$app->handleRequest(Request::capture());
-error_log("🐘 api/index.php: Request handled.");
+echo "<b>PHP Version:</b> " . PHP_VERSION . "<br>";
+echo "<b>Environment:</b><pre>";
+print_r($_ENV);
+echo "</pre>";
