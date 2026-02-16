@@ -1,20 +1,28 @@
 <?php
+
 echo "<h1>Vercel PHP Diagnostic</h1>";
-echo "<b>Current Directory:</b> " . __DIR__ . "<br>";
-echo "<b>Parent Directory Content:</b> " . implode(', ', scandir(__DIR__ . '/..')) . "<br>";
 
-$autoload = __DIR__ . '/../vendor/autoload.php';
-echo "<b>Checking for:</b> $autoload<br>";
+try {
+    error_reporting(E_ALL);
+    ini_set('display_errors', '1');
 
-if (file_exists($autoload)) {
-    echo "✅ Autoloader found!<br>";
-    require $autoload;
+    require __DIR__.'/../vendor/autoload.php';
     echo "✅ Autoloader loaded!<br>";
-} else {
-    echo "❌ Autoloader NOT found!<br>";
+
+    /** @var \Illuminate\Foundation\Application $app */
+    $app = require_once __DIR__.'/../bootstrap/app.php';
+    echo "✅ Laravel App bootstrapped!<br>";
+
+    $app->handleRequest(\Illuminate\Http\Request::capture());
+    echo "✅ Request handled!";
+} catch (\Throwable $e) {
+    echo "<h2>❌ Laravel Boot Error</h2>";
+    echo "<b>Message:</b> " . $e->getMessage() . "<br>";
+    echo "<b>File:</b> " . $e->getFile() . ":" . $e->getLine() . "<br>";
+    echo "<h3>Stack Trace:</h3><pre>" . $e->getTraceAsString() . "</pre>";
 }
 
+echo "<hr><h3>Environment Check</h3>";
+echo "<b>DB_CONNECTION:</b> " . (env('DB_CONNECTION') ?: 'NOT SET') . "<br>";
+echo "<b>APP_KEY:</b> " . (env('APP_KEY') ?: 'NOT SET') . "<br>";
 echo "<b>PHP Version:</b> " . PHP_VERSION . "<br>";
-echo "<b>Environment:</b><pre>";
-print_r($_ENV);
-echo "</pre>";

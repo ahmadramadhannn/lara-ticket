@@ -40,6 +40,15 @@ return [
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
 
+        'libsql' => [
+            'driver'                  => 'turso',
+            'db_url'                  => env('DB_URL', env('DB_SYNC_URL', '')),
+            'access_token'            => env('DB_ACCESS_TOKEN', env('DB_AUTH_TOKEN', '')),
+            'database'                => 'main',
+            'prefix'                  => '',
+            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+        ],
+
         'sqlite' => [
             'driver' => 'sqlite',
             'url' => env('DB_URL'),
