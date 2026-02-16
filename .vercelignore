@@ -16,5 +16,3 @@ phpunit.xml
 Dockerfile
 conf/
 scripts/
-**/.envrc
-vendor/turso/
