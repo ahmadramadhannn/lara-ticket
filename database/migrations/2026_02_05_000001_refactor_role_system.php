@@ -26,9 +26,16 @@ return new class extends Migration
             // The role column will accept any string value in SQLite
             // We just need to migrate the data
             DB::table('users')->where('role', 'operator')->update(['role' => 'company_admin']);
+        } elseif ($driver === 'pgsql') {
+            // Postgres uses different syntax for altering columns
+            DB::table('users')->where('role', 'operator')->update(['role' => 'company_admin']);
+            
+            // Alter the column type and default value separately
+            DB::statement("ALTER TABLE users ALTER COLUMN role TYPE VARCHAR(30)");
+            DB::statement("ALTER TABLE users ALTER COLUMN role SET DEFAULT 'buyer'");
         } else {
-            // For MySQL/PostgreSQL, we need to alter the enum
-            // First migrate existing operators
+            // For MySQL, we need to alter the enum
+            // First migrate existing usage
             DB::table('users')->where('role', 'operator')->update(['role' => 'company_admin']);
             
             // Then alter the column to allow new values
