@@ -28,7 +28,7 @@ class LibSQLDatabase
 
     protected function createLibSQL(string $config): LibSQL
     {
-        return new LibSQL($config);
+        return new LibSQLDriver($config);
     }
 
     public function version(): string
