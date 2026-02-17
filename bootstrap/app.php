@@ -12,6 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Trust Railway's reverse proxy
+        $middleware->trustProxies(at: '*');
+
         // Add SetLocale to web middleware group
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,

@@ -1,6 +1,12 @@
 #!/bin/sh
 set -e
 
+# Default PORT to 80 if not set (Railway provides PORT env var)
+export PORT=${PORT:-80}
+
+# Substitute PORT in nginx config template
+envsubst '${PORT}' < /etc/nginx/sites-available/default.template > /etc/nginx/sites-available/default
+
 # Run migrations
 echo "Running migrations..."
 php artisan migrate --force

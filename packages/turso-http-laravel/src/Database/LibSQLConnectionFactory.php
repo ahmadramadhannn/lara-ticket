@@ -9,7 +9,10 @@ class LibSQLConnectionFactory extends ConnectionFactory
     protected function createConnection($driver, $connection, $database, $prefix = '', array $config = [])
     {
         $config['driver'] = 'libsql';
-        $config['url'] = 'file:'.$config['database'];
+        $url = $config['url'] ?? $config['database'] ?? ':memory:';
+        $config['url'] = (str_starts_with($url, 'libsql://') || str_starts_with($url, 'http'))
+            ? $url
+            : 'file:' . $config['database'];
         $connection = function () use ($config) {
             return new LibSQLDatabase($config);
         };

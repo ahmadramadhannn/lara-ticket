@@ -14,7 +14,7 @@ class LibSQLHttpServiceProvider extends PackageServiceProvider
     public function boot(): void
     {
         parent::boot();
-        if (config('database.default') !== 'libsql' || config('database.connections.libsql.driver') === 'libsql') {
+        if (config('database.connections.' . config('database.default') . '.driver') !== 'libsql') {
             return;
         }
     }
@@ -38,12 +38,13 @@ class LibSQLHttpServiceProvider extends PackageServiceProvider
         });
 
         $this->app->scoped(LibSQLManager::class, function () {
-            return new LibSQLManager(config('database.connections.libsql'));
+            $connectionName = config('database.default', 'libsql');
+            return new LibSQLManager(config("database.connections.{$connectionName}"));
         });
 
         $this->app->resolving('db', function (DatabaseManager $db) {
             $db->extend('libsql', function ($config, $name) {
-                $config = config('database.connections.libsql');
+                $config = config("database.connections.{$name}");
                 $config['name'] = $name;
                 if (! isset($config['driver'])) {
                     $config['driver'] = 'libsql';
