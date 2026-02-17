@@ -227,10 +227,7 @@ class LibSQLConnection extends Connection
 
     protected function getDefaultQueryGrammar()
     {
-        ($grammar = new LibSQLQueryGrammar($this))->setConnection($this);
-        $this->withTablePrefix($grammar);
-
-        return $grammar;
+        return new LibSQLQueryGrammar($this);
     }
 
     public function useDefaultQueryGrammar()
@@ -238,17 +235,9 @@ class LibSQLConnection extends Connection
         $this->queryGrammar = $this->getDefaultQueryGrammar();
     }
 
-    /**
-     * Get the default schema grammar instance.
-     *
-     * @return \Illuminate\Database\Schema\Grammars\Grammar
-     */
     protected function getDefaultSchemaGrammar()
     {
-        ($grammar = new LibSQLSchemaGrammar($this))->setConnection($this);
-        $this->withTablePrefix($grammar);
-
-        return $grammar;
+        return new LibSQLSchemaGrammar($this);
     }
 
     public function useDefaultSchemaGrammar()
