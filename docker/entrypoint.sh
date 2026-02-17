@@ -5,16 +5,19 @@ set -e
 export PORT=${PORT:-80}
 
 # Substitute PORT in nginx config template
-envsubst '${PORT}' < /etc/nginx/sites-available/default.template > /etc/nginx/sites-available/default
+# Substitute PORT in nginx config template
+envsubst '${PORT}' < /etc/nginx/sites-available/default.template > /etc/nginx/sites-enabled/default
+
+# Verify Nginx config
+nginx -t
 
 # Run migrations
 echo "Running migrations..."
 php artisan migrate --force
 
-# Cache config, routes, and views for production performance
+# Cache config and views (skip route:cache to avoid closure issues)
 echo "Caching configuration..."
 php artisan config:cache
-php artisan route:cache
 php artisan view:cache
 
 # Start Supervisord
