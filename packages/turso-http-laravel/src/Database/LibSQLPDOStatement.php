@@ -36,7 +36,7 @@ class LibSQLPDOStatement
 
     public function query(array $parameters = []): array
     {
-        return $this->db->getDb()->prepare($this->query)->query($parameters)->fetchArray(LibSQL::LIBSQL_ALL);
+        return $this->db->getDb()->prepare($this->query)->query($parameters)->fetchArray(LibSQL::LIBSQL_ASSOC);
     }
 
     public function execute(array $parameters = []): bool
@@ -47,15 +47,15 @@ class LibSQLPDOStatement
             $statement = $this->db->getDb()->prepare($this->query);
             $this->response = $statement->query($parameters)->fetchArray(LibSQL::LIBSQL_ALL);
         }
-
-        $lastId = (int) $this->response['last_insert_rowid'];
+        
+        $lastId = (int) ($this->response['last_insert_rowid'] ?? 0);
         if ($lastId > 0) {
             $this->db->setLastInsertId(value: $lastId);
         }
 
-        $this->affectedRows = $this->response['affected_row_count'];
+        $this->affectedRows = $this->response['affected_row_count'] ?? 0;
 
-        return $this->affectedRows > 0;
+        return true;
     }
 
     public function fetch(

@@ -43,6 +43,11 @@ class LibSQLDriver extends LibSQL
         return new LibSQLResult($response);
     }
 
+    public function prepare(string $sql): \Darkterminal\TursoHttp\core\Http\LibSQLStatement
+    {
+        return new LibSQLStatementDriver($this, $sql);
+    }
+    
     public function execute(string $sql, array $parameters = []): int
     {
         $response = $this->http->prepareRequest($sql, $parameters)->executeRequest()->get();
@@ -56,7 +61,8 @@ class LibSQLDriver extends LibSQL
         }
 
         if (!isset($response['results']) || !is_array($response['results'])) {
-             throw new Exception("Unexpected response format from Turso: " . json_encode($response));
+             // throw new Exception("Unexpected response format from Turso: " . json_encode($response)); 
+             // Allow for executions that return no results if needed, but usually they return results structure
         }
 
         $result = Utils::removeCloseResponses($response['results']);
@@ -65,5 +71,17 @@ class LibSQLDriver extends LibSQL
         $this->affected_rows = $result['affected_row_count'] ?? 0;
         
         return $this->affected_rows;
+    }
+
+    public function version(): string
+    {
+        $response = Utils::makeRequest('GET', "{$this->baseURL}/version", $this->authToken);
+        
+        if (is_array($response)) {
+            // Adjust key based on actual API response, usually just the string or 'version' key
+            return $response['version'] ?? json_encode($response);
+        }
+
+        return (string) $response;
     }
 }

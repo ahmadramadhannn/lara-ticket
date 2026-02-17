@@ -33,6 +33,54 @@ class LibSQLConnection extends Connection
         $this->schemaGrammar = $this->getDefaultSchemaGrammar();
     }
 
+    public function select($query, $bindings = [], $useReadPdo = true)
+    {
+        return $this->run($query, $bindings, function ($query, $bindings) {
+            if ($this->pretending()) {
+                return [];
+            }
+
+            $statement = $this->getRawPdo()->prepare($query);
+
+            $results = $statement->query($bindings);
+
+            return array_map(fn ($result) => $result, $results);
+        });
+    }
+
+    public function statement($query, $bindings = []): bool
+    {
+        return $this->run($query, $bindings, function ($query, $bindings) {
+            if ($this->pretending()) {
+                return true;
+            }
+
+            $statement = $this->getRawPdo()->prepare($query);
+
+            return $statement->execute($bindings);
+        });
+    }
+
+    public function run($query, $bindings, \Closure $callback)
+    {
+        return parent::run($query, $bindings, $callback);
+    }
+    
+    public function unprepared($query)
+    {
+        return $this->run($query, [], function ($query) {
+            if ($this->pretending()) {
+                return true;
+            }
+
+            $result = $this->getRawPdo()->exec($query);
+
+            $this->recordsHaveBeenModified($change = $result !== false);
+
+            return $change;
+        });
+    }
+
     public function sync(): void
     {
         $this->db->sync();
@@ -41,13 +89,6 @@ class LibSQLConnection extends Connection
     public function getConnectionMode(): string
     {
         return $this->db->getConnectionMode();
-    }
-
-    public function statement($query, $bindings = []): bool
-    {
-        $res = $this->select($query, $bindings);
-
-        return ! empty($res);
     }
 
     public function getPdo(): LibSQLDatabase
@@ -97,21 +138,6 @@ class LibSQLConnection extends Connection
         $this->readPdo = $pdo;
 
         return $this;
-    }
-
-    public function select($query, $bindings = [], $useReadPdo = true)
-    {
-        return $this->run($query, $bindings, function ($query, $bindings) {
-            if ($this->pretending()) {
-                return [];
-            }
-
-            $statement = $this->getRawPdo()->prepare($query);
-
-            $results = $statement->query($bindings);
-
-            return array_map(fn ($result) => $result, $results);
-        });
     }
 
     public function selectResultSets($query, $bindings = [], $useReadPdo = true)
@@ -189,34 +215,15 @@ class LibSQLConnection extends Connection
                 return 0;
             }
 
-            $result = $this->getPdo()->prepare($query)->query($bindings);
+            $statement = $this->getPdo()->prepare($query);
+            
+            $statement->execute($bindings);
 
-            $this->recordsHaveBeenModified(
-                ($count = (int) $result['affected_row_count']) > 0
-            );
+            $count = $statement->getAffectedRows();
+
+            $this->recordsHaveBeenModified($count > 0);
 
             return $count;
-        });
-    }
-
-    /**
-     * Run a raw, unprepared query against the libSQL connection.
-     *
-     * @param  string  $query
-     * @return bool
-     */
-    public function unprepared($query)
-    {
-        return $this->run($query, [], function ($query) {
-            if ($this->pretending()) {
-                return true;
-            }
-
-            $result = $this->getRawPdo()->exec($query);
-
-            $this->recordsHaveBeenModified($change = $result !== false);
-
-            return $change;
         });
     }
 

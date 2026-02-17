@@ -14,41 +14,11 @@ class LibSQLQueryProcessor extends SQLiteProcessor
      */
     public function processTables($results): array
     {
-        return $this->useAssoc($results);
+        return $results;
     }
 
     public function processSelect(Builder $query, $results)
     {
-        $results = $this->useAssoc($results);
-
         return $results;
-    }
-
-    private function useAssoc(array $results)
-    {
-        $data = [];
-        $columns = array_map(function ($col) {
-            return $col['name'];
-        }, $results['cols']);
-
-        $values = array_map(function ($vals) {
-            $arr_vals = [];
-            $i = 0;
-            foreach ($vals as $val) {
-                if ($val['type'] === 'null') {
-                    $val['value'] = null;
-                }
-                $arr_vals[] = $val['value'];
-                $i++;
-            }
-
-            return $arr_vals;
-        }, $results['rows']);
-
-        foreach ($values as $value) {
-            $data[] = array_combine($columns, $value);
-        }
-
-        return $data;
     }
 }
